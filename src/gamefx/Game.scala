@@ -4,8 +4,8 @@ import javafx.scene.input.KeyCode
 
 trait Game {
   
-  val width: Double
-  val height: Double
+  def width: Double
+  def height: Double
   private [gamefx] var _stopped = false
   def stopped = _stopped
   private [gamefx] var _dt = 0.0

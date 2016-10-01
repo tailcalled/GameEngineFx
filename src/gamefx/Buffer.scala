@@ -12,9 +12,11 @@ trait Buffer { self =>
   
   def drawImage(tx: Tx, img: Image): Unit
   def drawPgram(tx: Tx, color: Color): Unit // apply tx to a 1x1 square and fill it with color
+  def drawPoly(tx: Tx, pts: Vector[Pt], color: Color): Unit
   def transform(t: Tx) = new Buffer {
     def drawImage(tx: Tx, img: Image) = self.drawImage(t compose tx, img)
     def drawPgram(tx: Tx, color: Color) = self.drawPgram(t compose tx, color)
+    def drawPoly(tx: Tx, pts: Vector[Pt], color: Color) = self.drawPoly(t compose tx, pts, color)
   }
   
 }
@@ -24,6 +26,7 @@ private [gamefx] class ContextBuffer(gfx: javafx.scene.canvas.GraphicsContext) e
   def tx2Tform(tx: Tx) = new javafx.scene.transform.Affine(
       tx.mxx, tx.mxy, tx.tx,
       tx.myx, tx.myy, tx.ty)
+  def convertColor(color: Color) = javafx.scene.paint.Color.rgb(color.r, color.g, color.b, color.a / 255.0)
   
   def drawImage(tx: Tx, img: Image) = {
     gfx.setTransform(tx2Tform(tx compose Scale(1.01, -1.01)))
@@ -31,8 +34,13 @@ private [gamefx] class ContextBuffer(gfx: javafx.scene.canvas.GraphicsContext) e
   }
   def drawPgram(tx: Tx, color: Color) = {
     gfx.setTransform(tx2Tform(tx))
-    gfx.setFill(javafx.scene.paint.Color.rgb(color.r, color.g, color.b, color.a / 255.0))
+    gfx.setFill(convertColor(color))
     gfx.fillRect(0, 0, 1.01, 1.01)
+  }
+  def drawPoly(tx: Tx, pts: Vector[Pt], color: Color) = {
+    gfx.setTransform(tx2Tform(tx))
+    gfx.setFill(convertColor(color))
+    gfx.fillPolygon(pts.view.map(_.x).toArray, pts.view.map(_.y).toArray, pts.length)
   }
   
 }

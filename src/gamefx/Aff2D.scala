@@ -24,6 +24,7 @@ case class Pt(x: Double, y: Double) {
   def norm = if (abs > 1e-30) this / abs else Pt(0, 0)
   def *&(t: Pt) = Pt(x * t.x - y * t.y, x * t.y + t.x * y) // complex multiplication
   def cross = Pt(-y, x)
+  def theta = math.atan2(y, x)
 }
 case class Tx(
     mxx: Double, mxy: Double, tx: Double,
